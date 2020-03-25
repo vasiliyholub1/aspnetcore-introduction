@@ -7,7 +7,6 @@ namespace AspNetCore.Introduction.Models
     {
         public Customers()
         {
-            CustomerCustomerDemo = new HashSet<CustomerCustomerDemo>();
             Orders = new HashSet<Orders>();
         }
 
@@ -24,7 +23,6 @@ namespace AspNetCore.Introduction.Models
         public DateTime? Founded { get; set; }
         public string Fax { get; set; }
 
-        public virtual ICollection<CustomerCustomerDemo> CustomerCustomerDemo { get; set; }
         public virtual ICollection<Orders> Orders { get; set; }
     }
 }
