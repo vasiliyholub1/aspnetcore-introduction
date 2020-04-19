@@ -16,9 +16,17 @@ namespace AspNetCore.Introduction.Controllers
         }
 
         // GET: Categories
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Categories.ToListAsync());
+            var categories = from category in _context.Categories
+                select category;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                categories = categories.Where(s => s.CategoryName.Contains(searchString));
+            }
+
+            return View(await categories.ToListAsync());
         }
 
         // GET: Categories/Details/5

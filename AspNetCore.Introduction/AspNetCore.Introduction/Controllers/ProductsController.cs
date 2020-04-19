@@ -16,9 +16,17 @@ namespace AspNetCore.Introduction.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Products.ToListAsync());
+            var products = _context.Products.Include(p => p.Category).AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                products = products.Where(p => p.ProductName.Contains(searchString));
+            }
+
+            return View(await products.ToListAsync());
         }
 
         // GET: Products/Details/5
@@ -62,6 +70,7 @@ namespace AspNetCore.Introduction.Controllers
         }
 
         // GET: Products/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
