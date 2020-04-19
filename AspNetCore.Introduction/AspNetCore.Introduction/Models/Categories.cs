@@ -3,13 +3,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AspNetCore.Introduction.Models
 {
-    public partial class Categories
+    public class Categories
     {
         public Categories()
         {
             Products = new HashSet<Products>();
         }
 
+        [Key]
         public int CategoryId { get; set; }
         
         [Display(Name = "Category name")]

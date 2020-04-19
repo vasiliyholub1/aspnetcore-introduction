@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AspNetCore.Introduction.Controllers
 {
+    using Microsoft.AspNetCore.Mvc.Rendering;
+    using ViewModels;
+
     public class ProductsController : Controller
     {
         private readonly AspNetCoreIntroductionContext _context;
@@ -17,16 +20,32 @@ namespace AspNetCore.Introduction.Controllers
 
         // GET: Products
         [HttpGet]
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(string productCategory, string searchString)
         {
-            var products = _context.Products.Include(p => p.Category).AsQueryable();
+            IQueryable<string> categoryQuery = from m in _context.Products
+                orderby m.Category.CategoryName
+                select m.Category.CategoryName;
+
+            var products = from p in _context.Products
+                select p;
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                products = products.Where(p => p.ProductName.Contains(searchString));
+                products = products.Where(s => s.ProductName.Contains(searchString));
             }
 
-            return View(await products.ToListAsync());
+            if (!string.IsNullOrEmpty(productCategory))
+            {
+                products = products.Where(x => x.Category.CategoryName == productCategory);
+            }
+
+            var productCategoryVM = new ProductCategoryViewModel()
+            {
+                Categories = new SelectList(await categoryQuery.Distinct().ToListAsync()),
+                Products = await products.ToListAsync()
+            };
+
+            return View(productCategoryVM);
         }
 
         // GET: Products/Details/5

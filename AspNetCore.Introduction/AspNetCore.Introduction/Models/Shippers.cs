@@ -3,13 +3,16 @@ using System.Collections.Generic;
 
 namespace AspNetCore.Introduction.Models
 {
-    public partial class Shippers
+    using System.ComponentModel.DataAnnotations;
+
+    public class Shippers
     {
         public Shippers()
         {
             Orders = new HashSet<Orders>();
         }
 
+        [Key]
         public int ShipperId { get; set; }
         public string CompanyName { get; set; }
         public string Phone { get; set; }

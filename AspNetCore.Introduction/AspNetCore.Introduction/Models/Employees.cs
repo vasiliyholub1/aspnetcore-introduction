@@ -3,7 +3,9 @@ using System.Collections.Generic;
 
 namespace AspNetCore.Introduction.Models
 {
-    public partial class Employees
+    using System.ComponentModel.DataAnnotations;
+
+    public class Employees
     {
         public Employees()
         {
@@ -12,6 +14,7 @@ namespace AspNetCore.Introduction.Models
             Orders = new HashSet<Orders>();
         }
 
+        [Key]
         public int EmployeeId { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }

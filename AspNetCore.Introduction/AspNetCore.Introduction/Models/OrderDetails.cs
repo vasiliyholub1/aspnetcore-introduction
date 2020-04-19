@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace AspNetCore.Introduction.Models
 {
-    public partial class OrderDetails
+    public class OrderDetails
     {
         public int OrderId { get; set; }
         public int ProductId { get; set; }
