@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AspNetCore.Introduction.Models
 {
-    public partial class Products
+    public class Products
     {
         public Products()
         {

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AspNetCore.Introduction.Models
 {
-    public partial class Categories
+    public class Categories
     {
         public Categories()
         {

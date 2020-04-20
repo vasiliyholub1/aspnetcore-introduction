@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace AspNetCore.Introduction.Models
+﻿namespace AspNetCore.Introduction.Models
 {
     public partial class OrderDetails
     {
