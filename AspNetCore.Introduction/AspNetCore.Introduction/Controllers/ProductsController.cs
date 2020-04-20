@@ -16,9 +16,22 @@ namespace AspNetCore.Introduction.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Products.ToListAsync());
+            var products = from product in _context.Products
+                           select product;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                products = products.Where(p => p.ProductName.Contains(searchString));
+            }
+
+            // Retrieves category data.
+            products = products
+                .Include(p => p.Category)
+                .Include(p => p.Supplier);
+
+            return View(await products.ToListAsync());
         }
 
         // GET: Products/Details/5

@@ -10,12 +10,17 @@ namespace AspNetCore.Introduction.Models
             Products = new HashSet<Products>();
         }
 
+        [Required]
         public int CategoryId { get; set; }
         
         [Display(Name = "Category name")]
+        [RegularExpression(@"^[A-Z]+[a-zA-Z""'\s-]*$")]
+        [StringLength(15)]
+        [Required]
         public string CategoryName { get; set; }
 
         [Display(Name = "Description")]
+        [RegularExpression(@"^[A-Z]+[a-zA-Z0-9""'\s-]*$")]
         public string Description { get; set; }
 
         [Display(Name = "Picture")]

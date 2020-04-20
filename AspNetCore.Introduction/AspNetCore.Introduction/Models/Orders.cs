@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace AspNetCore.Introduction.Models
 {
@@ -13,11 +14,15 @@ namespace AspNetCore.Introduction.Models
         public int OrderId { get; set; }
         public string CustomerId { get; set; }
         public int? EmployeeId { get; set; }
+        [Display(Name = "Order date"), DataType(DataType.Date)]
         public DateTime? OrderDate { get; set; }
+        [Display(Name = "Required date"), DataType(DataType.Date)]
         public DateTime? RequiredDate { get; set; }
+        [Display(Name = "Shipped date"), DataType(DataType.Date)]
         public DateTime? ShippedDate { get; set; }
         public int? ShipVia { get; set; }
         public decimal? Freight { get; set; }
+        [RegularExpression(@"^[A-Z]+[a-zA-Z""'\s-]*$"), StringLength(40)]
         public string ShipName { get; set; }
         public string ShipAddress { get; set; }
         public string ShipCity { get; set; }
