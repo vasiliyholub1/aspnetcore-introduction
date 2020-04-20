@@ -2,13 +2,16 @@
 
 namespace AspNetCore.Introduction.Models
 {
-    public partial class Regions
+    using System.ComponentModel.DataAnnotations;
+
+    public class Regions
     {
         public Regions()
         {
             Territories = new HashSet<Territories>();
         }
 
+        [Key]
         public int RegionId { get; set; }
         public string RegionDescription { get; set; }
 

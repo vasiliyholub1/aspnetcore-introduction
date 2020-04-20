@@ -3,13 +3,15 @@ using System.Collections.Generic;
 
 namespace AspNetCore.Introduction.Models
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class Customers
     {
         public Customers()
         {
             Orders = new HashSet<Orders>();
         }
-
+        [Key]
         public string CustomerId { get; set; }
         public string CompanyName { get; set; }
         public string ContactName { get; set; }

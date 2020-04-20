@@ -19,6 +19,7 @@ namespace AspNetCore.Introduction.Controllers
         }
 
         // GET: Regions
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Regions.ToListAsync());
@@ -65,6 +66,7 @@ namespace AspNetCore.Introduction.Controllers
         }
 
         // GET: Regions/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

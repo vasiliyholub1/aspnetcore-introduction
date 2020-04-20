@@ -1,17 +1,22 @@
-﻿@model IEnumerable<AspNetCore.Introduction.Models.Products>
+﻿@model AspNetCore.Introduction.ViewModels.ProductCategoryViewModel
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Products</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<form asp-controller="Products" asp-action="Index">
+<form asp-controller="Products" asp-action="Index" method="get">
     <p>
-        Title: <input type="text" name="searchString">
+
+        <select asp-for="ProductCategory" asp-items="Model.Categories">
+            <option value="">All</option>
+        </select>
+
+        Title: <input type="text" asp-for="SearchString" />
         <input type="submit" value="Filter" />
     </p>
 </form>
@@ -19,69 +24,45 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Category.CategoryName)
+                @Html.DisplayNameFor(model => model.Products[0].ProductId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ProductName)
+                @Html.DisplayNameFor(model => model.Products[0].Category.CategoryName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Discontinued)
+                @Html.DisplayNameFor(model => model.Products[0].ProductName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.QuantityPerUnit)
+                @Html.DisplayNameFor(model => model.Products[0].Discontinued)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UnitPrice)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Supplier.CompanyName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReorderLevel)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UnitsOnOrder)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UnitsInStock)
+                @Html.DisplayNameFor(model => model.Products[0].UnitPrice)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Products) {
         <tr>
             <td>
-                @Html.DisplayFor(itemItem => item.Category.CategoryName)
+                @Html.DisplayFor(modelItem => item.ProductId)
             </td>
             <td>
-                @Html.DisplayFor(itemItem => item.ProductName)
+                @Html.DisplayFor(modelItem => item.Category.CategoryName)
             </td>
             <td>
-                @Html.DisplayFor(itemItem => item.Discontinued)
+                @Html.DisplayFor(modelItem => item.ProductName)
             </td>
             <td>
-                @Html.DisplayFor(itemItem => item.QuantityPerUnit)
+                @Html.DisplayFor(modelItem => item.Discontinued)
             </td>
             <td>
-                @Html.DisplayFor(itemItem => item.UnitPrice)
+                @Html.DisplayFor(modelItem => item.UnitPrice)
             </td>
             <td>
-                @Html.DisplayFor(itemItem => item.Supplier.CompanyName)
-            </td>
-            <td>
-                @Html.DisplayFor(itemItem => item.ReorderLevel)
-            </td>
-            <td>
-                @Html.DisplayFor(itemItem => item.UnitsOnOrder)
-            </td>
-            <td>
-                @Html.DisplayFor(itemItem => item.UnitsInStock)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.CategoryId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CategoryId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
             </td>
         </tr>
 }
