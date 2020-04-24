@@ -1,8 +1,10 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using AspNetCore.Introduction.Configuration;
 using AspNetCore.Introduction.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace AspNetCore.Introduction.Controllers
 {
@@ -13,8 +15,11 @@ namespace AspNetCore.Introduction.Controllers
     {
         private readonly AspNetCoreIntroductionContext _context;
 
-        public ProductsController(AspNetCoreIntroductionContext context)
+        private readonly MandatoryInfoConfiguration _configuration;
+
+        public ProductsController(AspNetCoreIntroductionContext context, IOptions<MandatoryInfoConfiguration> config)
         {
+            _configuration = config.Value;
             _context = context;
         }
 
@@ -38,6 +43,16 @@ namespace AspNetCore.Introduction.Controllers
             {
                 products = products.Where(x => x.Category.CategoryName == productCategory);
             }
+
+            var maxItemInList = _configuration.MaxItemsInList;
+
+            products = products
+                .Include(p => p.Category)
+                .Include(p => p.Supplier);
+
+            products = maxItemInList > 0
+                ? products.Take(maxItemInList)
+                : products;
 
             var productCategoryVM = new ProductCategoryViewModel()
             {

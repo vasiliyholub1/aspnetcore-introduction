@@ -1,3 +1,4 @@
+using AspNetCore.Introduction.Extensions;
 using AspNetCore.Introduction.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,8 +21,11 @@ namespace AspNetCore.Introduction
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<AspNetCoreIntroductionContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("AspNetCoreIntroductionContext")));
+            services.AddDbContext<AspNetCoreIntroductionContext>(options => 
+                options.UseSqlServer(Configuration.GetConnectionString("AspNetCoreIntroductionContext")));
+
+            services.AddConfig(mandatoryInfoConfiguration =>
+                Configuration.GetSection("MandatoryInfoConfiguration").Bind(mandatoryInfoConfiguration));
 
             services.AddControllersWithViews();
         }
