@@ -13,8 +13,8 @@ namespace AspNetCore.Introduction.Models
         [Key]
         public int CategoryId { get; set; }
         
-        [Display(Name = "Category name")]
         [Required]
+        [Display(Name = "Category")]
         public string CategoryName { get; set; }
 
         [Display(Name = "Description")]

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AspNetCore.Introduction.Configuration;
 using AspNetCore.Introduction.Models;
@@ -17,6 +18,42 @@ namespace AspNetCore.Introduction.Controllers
 
         private readonly MandatoryInfoConfiguration _configuration;
 
+        private IQueryable<Categories> CategoryQuery =>
+            from c in _context.Categories
+            orderby c.CategoryName
+            select c;
+
+        private IQueryable<Suppliers> SupplierQuery =>
+            from e in _context.Suppliers
+            orderby e.CompanyName
+            select e;
+
+        private SelectList SupplierList
+        {
+            get
+            {
+                var value = GetFieldName(typeof(Suppliers), "SupplierId");
+                var text = GetFieldName(typeof(Suppliers), "CompanyName");
+                return new SelectList(SupplierQuery.ToList(), value, text);
+            }
+        }
+
+        private SelectList CategoryList
+        {
+            get
+            {
+                var value = GetFieldName(typeof(Categories), "CategoryId");
+                var text = GetFieldName(typeof(Categories), "CategoryName");
+                return new SelectList(CategoryQuery.ToList(), value, text);
+            }
+        }
+
+        private string GetFieldName(Type type, string supposeName)
+        {
+            var supplierProperties = type.GetProperties();
+            return supplierProperties.First(s => s.Name == supposeName).Name;
+        }
+
         public ProductsController(AspNetCoreIntroductionContext context, IOptions<MandatoryInfoConfiguration> config)
         {
             _configuration = config.Value;
@@ -27,10 +64,6 @@ namespace AspNetCore.Introduction.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string productCategory, string searchString)
         {
-            IQueryable<string> categoryQuery = from m in _context.Products
-                orderby m.Category.CategoryName
-                select m.Category.CategoryName;
-
             var products = from p in _context.Products
                 select p;
 
@@ -56,7 +89,7 @@ namespace AspNetCore.Introduction.Controllers
 
             var productCategoryVM = new ProductCategoryViewModel()
             {
-                Categories = new SelectList(await categoryQuery.Distinct().ToListAsync()),
+                Categories = new SelectList(await CategoryQuery.Select(c => c.CategoryName).Distinct().ToListAsync()),
                 Products = await products.ToListAsync()
             };
 
@@ -82,9 +115,16 @@ namespace AspNetCore.Introduction.Controllers
         }
 
         // GET: Products/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var productCreationVM = new ProductCreationViewModel()
+            {
+                Product = new Products(),
+                Categories = CategoryList,
+                Suppliers = SupplierList
+            };
+
+            return View(productCreationVM);
         }
 
         // POST: Products/Create
@@ -92,15 +132,16 @@ namespace AspNetCore.Introduction.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,ProductName,SupplierId,CategoryId,QuantityPerUnit,UnitPrice,UnitsInStock,UnitsOnOrder,ReorderLevel,Discontinued")] Products Products)
+        public async Task<IActionResult> Create([Bind("Product,Categories,Suppliers")] ProductCreationViewModel productCreationViewModel)
         {
+            var productAdding = productCreationViewModel.Product;
             if (ModelState.IsValid)
             {
-                _context.Add(Products);
+                _context.Add(productAdding);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(Products);
+            return View(productAdding);
         }
 
         // GET: Products/Edit/5
@@ -112,12 +153,21 @@ namespace AspNetCore.Introduction.Controllers
                 return NotFound();
             }
 
-            var Products = await _context.Products.FindAsync(id);
-            if (Products == null)
+            var products = await _context.Products.FindAsync(id);
+
+            if (products == null)
             {
                 return NotFound();
             }
-            return View(Products);
+
+            var productCreationVM = new ProductCreationViewModel()
+            {
+                Product = products,
+                Categories = CategoryList,
+                Suppliers = SupplierList
+            };
+
+            return View(productCreationVM);
         }
 
         // POST: Products/Edit/5
@@ -125,9 +175,9 @@ namespace AspNetCore.Introduction.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,SupplierId,CategoryId,QuantityPerUnit,UnitPrice,UnitsInStock,UnitsOnOrder,ReorderLevel,Discontinued")] Products Products)
+        public async Task<IActionResult> Edit(int id, [Bind("Product,Categories,Suppliers")] ProductCreationViewModel productCreationViewModel)
         {
-            if (id != Products.ProductId)
+            if (id != productCreationViewModel.Product.ProductId)
             {
                 return NotFound();
             }
@@ -136,12 +186,12 @@ namespace AspNetCore.Introduction.Controllers
             {
                 try
                 {
-                    _context.Update(Products);
+                    _context.Update(productCreationViewModel.Product);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductsExists(Products.ProductId))
+                    if (!ProductsExists(productCreationViewModel.Product.ProductId))
                     {
                         return NotFound();
                     }

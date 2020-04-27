@@ -13,6 +13,8 @@ namespace AspNetCore.Introduction.Models
 
         [Key]
         public int ShipperId { get; set; }
+
+        [Display(Name = "Shipper name")]
         public string CompanyName { get; set; }
         public string Phone { get; set; }
 

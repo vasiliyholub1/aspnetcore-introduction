@@ -13,6 +13,8 @@ namespace AspNetCore.Introduction.Models
 
         [Key]
         public int SupplierId { get; set; }
+
+        [Display(Name = "Name of supplier")]
         public string CompanyName { get; set; }
         public string ContactName { get; set; }
         public string ContactTitle { get; set; }
