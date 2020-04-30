@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+h1 {text-align: center;}
+p, li {
+  font-size: large;
+}
+done {}
+</style>
+<title>Asp.Net Core - Introduction</title>
+</head>
+<body>
+
+<h1>Lections</h1>
+<a href=https://app.pluralsight.com/library/courses/aspdotnet-core-fundamentals>ASP.NET Core Fundamentals | Pluralsight</a>
+<h2>Common</h2>
+
+<p><span style="background-color:yellow">You should create a site, which enable to work with Northwind Database </span><a href=https://epam.sharepoint.com/sites/ASPNetCore/Shared%20Documents/Materials/instnwnd.zip?csf=1&web=1>
+(script with DB structure and test data is attached)</a></p>
+<p><h2>Base requirements:</h2></p>
+<ul>
+<li><span style="background-color:yellow">Site should be developed using ASP.Net Core 2+</span></li>
+<li><span style="background-color:lightgreen">Server side should be worked on Microsoft Windows (cross platform is not required)</span></li>
+<li><span style="background-color:yellow">MS SQL Server is used as DBMS (you can use any edition, including LocalDB)</span></li>
+<li><span style="background-color:yellow">EF Core is used for data access</span></li>
+<li><span style="background-color:yellow">If there no special instructions, no requirements apply to the layout and styling of the pages</span></li>
+</ul>
+
+<h1>Task 1. Base site</h1>
+
+<p><h2>Create site with follow pages:</h2></p>
+<ul>
+<li><span style="background-color:yellow">Home page, contained welcome message and links to other page</span></li>
+<li><span style="background-color:yellow">Categories page. Show list of categories without images</span></li>
+<li><span style="background-color:yellow">Products page. Show table with products</span></li>
+<ul>
+<li><span style="background-color:yellow">Table contains all products fields</span></li>
+<li><span style="background-color:yellow">Instead of references to Category and Supplier should be showed their names</span></li>
+</ul>
+</ul>
+
+<h2>Note:</h2>
+<ul><li><span style="background-color:yellow">All configuring parameters (connection strings, …, etc) can keep in code (hardcoded)</span></li></ul>
+
+<h2>Materials:</h2>
+<ul><li><a href=https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/>Create a web app with ASP.NET Core MVC using Visual Studio</a></li></ul>
+
+<h1>Task 2. Startup and configuration</h1>
+
+<p><h2>Add configuration feature with support 2 parameters:</h2></p>
+<ul>
+<li><span style="background-color:yellow">Database connection string</span></li>
+<li><span style="background-color:yellow">Maximum (M) products count on Product page (show only first M products, others – ignored; if M == 0 show all products) </span></li>
+</ul>
+
+<h2>Materials:</h2>
+<ul>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/fundamentals/startup>Application startup in ASP.NET Core</a></li>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/>Configure an ASP.NET Core App</a></li>
+</ul>
+
+<h1>Task 3. Edit forms and Server-side validation</h1>
+
+<p><h2>Add edit forms (New and Update) for products:</h2></p>
+<ul>
+<li><span style="background-color:yellow">Related entities (such as category) should be presented as dropdown list<span></li>
+</ul>
+<p><h2>Add server-side validation for edited products (not less than 3 different rules)</h2></p>
+
+<h2>Materials:</h2>
+<ul>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation>Introduction to model validation in ASP.NET Core MVC</a></li>
+</ul>
+
+
+</body>
+</html>

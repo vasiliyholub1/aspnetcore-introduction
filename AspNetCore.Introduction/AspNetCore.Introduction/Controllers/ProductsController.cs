@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AspNetCore.Introduction.Configuration;
 using AspNetCore.Introduction.Interfaces;
@@ -61,26 +62,14 @@ namespace AspNetCore.Introduction.Controllers
 
         // GET: Products
         [HttpGet]
-        public async Task<IActionResult> Index(string productCategory, string searchString)
+        public IActionResult Index(string productCategory, string searchString)
         {
-            var products = _productRepository.Queryable();
-
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                products = products.Where(s => s.ProductName.Contains(searchString));
-            }
-
-            if (!string.IsNullOrEmpty(productCategory))
-            {
-                products = products.Where(x => x.Category.CategoryName == productCategory);
-            }
+            var products = _productRepository
+                .Get(GetProductsFilter(productCategory, searchString),
+                    null,"Category,Supplier");
 
             var maxItemInList = _configuration.MaxItemsInList;
 
-
-            products = products
-                .Include(p => p.Category)
-                .Include(p => p.Supplier);
 
             products = maxItemInList > 0
                 ? products.Take(maxItemInList)
@@ -88,11 +77,31 @@ namespace AspNetCore.Introduction.Controllers
 
             var productCategoryVM = new ProductCategoryViewModel()
             {
-                Categories = new SelectList(await CategoryQuery.Select(c => c.CategoryName).Distinct().ToListAsync()),
-                Products = await products.ToListAsync()
+                Categories = new SelectList(CategoryQuery.Select(c => c.CategoryName).Distinct().ToList()),
+                Products = products.ToList()
             };
 
             return View(productCategoryVM);
+        }
+
+        private static Expression<Func<Products, bool>> GetProductsFilter(string productCategory, string searchString)
+        {
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                if (!string.IsNullOrEmpty(productCategory))
+                {
+                    return p => p.ProductName.Contains(searchString) && p.Category.CategoryName == productCategory;
+                }
+
+                return p => p.ProductName.Contains(searchString);
+            }
+
+            if (!string.IsNullOrEmpty(productCategory))
+            {
+                return p => p.Category.CategoryName == productCategory;
+            }
+
+            return p => true;
         }
 
         // GET: Products/Details/5

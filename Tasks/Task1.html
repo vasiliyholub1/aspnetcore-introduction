@@ -13,66 +13,96 @@ done {}
 <body>
 
 <h1>Lections</h1>
-<a href=https://app.pluralsight.com/library/courses/aspdotnet-core-fundamentals>ASP.NET Core Fundamentals | Pluralsight</a>
+<a href=https://app.pluralsight.com/library/courses/aspnet-core-mvc-request-life-cycle>ASP.NET Core: The MVC Request Life Cycle</a>
 <h2>Common</h2>
 
-<p><span style="background-color:yellow">You should create a site, which enable to work with Northwind Database </span><a href=https://epam.sharepoint.com/sites/ASPNetCore/Shared%20Documents/Materials/instnwnd.zip?csf=1&web=1>
-(script with DB structure and test data is attached)</a></p>
-<p><h2>Base requirements:</h2></p>
+<p>This homework based on results from <b>Introduction</b> module.</p>
+
+
+<h1>Task 1. DI/IoC and unit testing for controllers</h1>
+
+<p><h2>In this task you should:</h2></p>
 <ul>
-<li><span style="background-color:yellow">Site should be developed using ASP.Net Core 2+</span></li>
-<li><span style="background-color:lightgreen">Server side should be worked on Microsoft Windows (cross platform is not required)</span></li>
-<li><span style="background-color:yellow">MS SQL Server is used as DBMS (you can use any edition, including LocalDB)</span></li>
-<li><span style="background-color:yellow">EF Core is used for data access</span></li>
-<li><span style="background-color:yellow">If there no special instructions, no requirements apply to the layout and styling of the pages</span></li>
+<li><span style="background-color:yellow">Switch all available controllers to inject dependencies trough constructor</span></li>
+<li><span style="background-color:yellow">Register in Startup.ConfigureServices() all necessary dependencies classes</span></li>
+<li><span style="background-color:yellow">Add separate projects with tests</span></li>
+<li><span style="background-color:lightgray">Create at least one test for every public action</span></li>
+<ul>
+<li><span style="background-color:yellow">Every external dependency should be mocked or stubbed!</span></li>
 </ul>
-
-<h1>Task 1. Base site</h1>
-
-<p><h2>Create site with follow pages:</h2></p>
-<ul>
-<li><span style="background-color:yellow">Home page, contained welcome message and links to other page</span></li>
-<li><span style="background-color:yellow">Categories page. Show list of categories without images</span></li>
-<li><span style="background-color:yellow">Products page. Show table with products</span></li>
-<ul>
-<li><span style="background-color:yellow">Table contains all products fields</span></li>
-<li><span style="background-color:yellow">Instead of references to Category and Supplier should be showed their names</span></li>
-</ul>
-</ul>
-
-<h2>Note:</h2>
-<ul><li><span style="background-color:yellow">All configuring parameters (connection strings, …, etc) can keep in code (hardcoded)</span></li></ul>
-
-<h2>Materials:</h2>
-<ul><li><a href=https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/>Create a web app with ASP.NET Core MVC using Visual Studio</a></li></ul>
-
-<h1>Task 2. Startup and configuration</h1>
-
-<p><h2>Add configuration feature with support 2 parameters:</h2></p>
-<ul>
-<li><span style="background-color:yellow">Database connection string</span></li>
-<li><span style="background-color:yellow">Maximum (M) products count on Product page (show only first M products, others – ignored; if M == 0 show all products) </span></li>
 </ul>
 
 <h2>Materials:</h2>
 <ul>
-<li><a href=https://docs.microsoft.com/en-us/aspnet/core/fundamentals/startup>Application startup in ASP.NET Core</a></li>
-<li><a href=https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/>Configure an ASP.NET Core App</a></li>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection>Dependency injection in ASP.NET Core</a></li>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/dependency-injection>Dependency injection into controllers in ASP.NET Core</a></li>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing>Testing controller logic in ASP.NET Core</a></li>
 </ul>
 
-<h1>Task 3. Edit forms and Server-side validation</h1>
+<h1>Task 2. Action Results and File Uploads</h1>
 
-<p><h2>Add edit forms (New and Update) for products:</h2></p>
+<p><h2>Add new Action into Category Controller, which return category image:</h2></p>
 <ul>
-<li><span style="background-color:yellow">Related entities (such as category) should be presented as dropdown list<span></li>
+<li><span style="background-color:lightgray">Image should be sending as binary stream with correct Content-Type (for referencing from HTML pages)</span></li>
 </ul>
-<p><h2>Add server-side validation for edited products (not less than 3 different rules)</h2></p>
+
+<h2>Note</h2>
+<p><span style="background-color:lightgray">lease note that test data for Northwind Categories contain broken images (it is BMP pictures, but first 78 bytes – garbage)<span></p>
+<br/>
+<p><span style="background-color:lightgray">Add links to images in category list.<span></p>
+<p><span style="background-color:lightgray">Add edit form for change image in Category (upload new image)<span></p>
 
 <h2>Materials:</h2>
 <ul>
-<li><a href=https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation>Introduction to model validation in ASP.NET Core MVC</a></li>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/mvc/models/formatting>Format response data in ASP.NET Core MVC</a></li>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads>File uploads in ASP.NET Core</a></li>
 </ul>
 
+<h1>Task 3. Routing configuration</h1>
+
+<p><span style="background-color:lightgray">Configure routing for enable getting images not only by standard path <b>{controller}/{action}/</b>, but also by <b>images/{image_id}</b></span></p>
+
+<h2>Materials:</h2>
+<ul>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing>Routing in ASP.NET Core</a></li>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/routing>Routing to controller actions in ASP.NET Core</a></li>
+</ul>
+
+<h1>Task 4. Custom Middleware</h1>
+
+<p><span style="background-color:lightgray">Create own middleware component for image caching. Middleware should:</b></span></p>
+<ul>
+<li><span style="background-color:lightgray">Check Content-Type every response and if returned any valid image format:</span></li>
+<ul>
+<li><span style="background-color:lightgray">Keep image on the disk (as file)</span></li>
+<li><span style="background-color:lightgray">If next request accessing to the same image, get it from cache directory</span></li>
+</ul>
+<li><span style="background-color:lightgray">Support follow options:</span></li>
+<ul>
+<li><span style="background-color:lightgray">Path for cache directory</span></li>
+<li><span style="background-color:lightgray">Max count of cached images</span></li>
+<li><span style="background-color:lightgray">Cache expiration time (if no requests during this time, cache cleaned)</span></li>
+</ul>
+</ul>
+<p><span style="background-color:lightgray">Include the middleware into request pipeline of your application<span></p>
+
+<h2>Materials:</h2>
+<ul>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware>ASP.NET Core Middleware</a></li>
+</ul>
+
+<h1>Task 5. Filters</h1>
+<p><span style="background-color:lightgray">Add MVC filter for logging Action calls. Filter should:</b></span></p>
+<ul>
+<li><span style="background-color:lightgray">Logs Action start/end</span></li>
+<li><span style="background-color:lightgray">Use standard ASP.Net Core logging infrastructure</span></li>
+<li><span style="background-color:lightgray">Provide option, which on/off logging parameters of Action method (by default – it’s off)</span></li>
+</ul>
+
+<h2>Materials:</h2>
+<ul>
+<li><a href=https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/filters>Filters in ASP.NET Core</a></li>
+</ul>
 
 </body>
 </html>
