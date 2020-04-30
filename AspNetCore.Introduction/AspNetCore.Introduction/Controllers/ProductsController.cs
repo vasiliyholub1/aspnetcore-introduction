@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AspNetCore.Introduction.Configuration;
+using AspNetCore.Introduction.Interfaces;
 using AspNetCore.Introduction.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,19 +15,15 @@ namespace AspNetCore.Introduction.Controllers
 
     public class ProductsController : Controller
     {
-        private readonly AspNetCoreIntroductionContext _context;
+        private readonly IDbProductRepository _productRepository;
+        private readonly IDbCategoryRepository _categoryRepository;
+        private readonly IDbSupplierRepository _supplierRepository ;
 
         private readonly MandatoryInfoConfiguration _configuration;
 
-        private IQueryable<Categories> CategoryQuery =>
-            from c in _context.Categories
-            orderby c.CategoryName
-            select c;
+        private IQueryable<Categories> CategoryQuery => _categoryRepository.Queryable().OrderBy(c => c.CategoryName);
 
-        private IQueryable<Suppliers> SupplierQuery =>
-            from e in _context.Suppliers
-            orderby e.CompanyName
-            select e;
+        private IQueryable<Suppliers> SupplierQuery => _supplierRepository.Queryable().OrderBy(s => s.CompanyName);
 
         private SelectList SupplierList
         {
@@ -54,18 +51,19 @@ namespace AspNetCore.Introduction.Controllers
             return supplierProperties.First(s => s.Name == supposeName).Name;
         }
 
-        public ProductsController(AspNetCoreIntroductionContext context, IOptions<MandatoryInfoConfiguration> config)
+        public ProductsController(IOptions<MandatoryInfoConfiguration> config, IDbProductRepository productRepository, IDbCategoryRepository categoryRepository, IDbSupplierRepository supplierRepository)
         {
+            _productRepository = productRepository;
+            _categoryRepository = categoryRepository;
+            _supplierRepository = supplierRepository;
             _configuration = config.Value;
-            _context = context;
         }
 
         // GET: Products
         [HttpGet]
         public async Task<IActionResult> Index(string productCategory, string searchString)
         {
-            var products = from p in _context.Products
-                select p;
+            var products = _productRepository.Queryable();
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -78,6 +76,7 @@ namespace AspNetCore.Introduction.Controllers
             }
 
             var maxItemInList = _configuration.MaxItemsInList;
+
 
             products = products
                 .Include(p => p.Category)
@@ -104,14 +103,13 @@ namespace AspNetCore.Introduction.Controllers
                 return NotFound();
             }
 
-            var Products = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (Products == null)
+            var products = await _productRepository.FindAsync(id);
+            if (products == null)
             {
                 return NotFound();
             }
 
-            return View(Products);
+            return View(products);
         }
 
         // GET: Products/Create
@@ -137,8 +135,8 @@ namespace AspNetCore.Introduction.Controllers
             var productAdding = productCreationViewModel.Product;
             if (ModelState.IsValid)
             {
-                _context.Add(productAdding);
-                await _context.SaveChangesAsync();
+                _productRepository.Insert(productAdding);
+                await _productRepository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(productAdding);
@@ -153,7 +151,7 @@ namespace AspNetCore.Introduction.Controllers
                 return NotFound();
             }
 
-            var products = await _context.Products.FindAsync(id);
+            var products = await _productRepository.FindAsync(id);
 
             if (products == null)
             {
@@ -186,8 +184,8 @@ namespace AspNetCore.Introduction.Controllers
             {
                 try
                 {
-                    _context.Update(productCreationViewModel.Product);
-                    await _context.SaveChangesAsync();
+                    _productRepository.Update(productCreationViewModel.Product);
+                    await _productRepository.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -202,7 +200,7 @@ namespace AspNetCore.Introduction.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(Products);
+            return View(productCreationViewModel);
         }
 
         // GET: Products/Delete/5
@@ -213,14 +211,13 @@ namespace AspNetCore.Introduction.Controllers
                 return NotFound();
             }
 
-            var Products = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (Products == null)
+            var products = await _productRepository.FindAsync(id);
+            if (products == null)
             {
                 return NotFound();
             }
 
-            return View(Products);
+            return View(products);
         }
 
         // POST: Products/Delete/5
@@ -228,15 +225,15 @@ namespace AspNetCore.Introduction.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var Products = await _context.Products.FindAsync(id);
-            _context.Products.Remove(Products);
-            await _context.SaveChangesAsync();
+            var Products = await _productRepository.FindAsync(id);
+            _productRepository.Delete(Products);
+            await _productRepository.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProductsExists(int id)
         {
-            return _context.Products.Any(e => e.ProductId == id);
+            return _productRepository.Get().Any(e => e.ProductId == id);
         }
     }
 }

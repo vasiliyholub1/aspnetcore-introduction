@@ -1,5 +1,5 @@
 using AspNetCore.Introduction.Extensions;
-using AspNetCore.Introduction.Models;
+using AspNetCore.Introduction.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +23,8 @@ namespace AspNetCore.Introduction
         {
             services.AddDbContext<AspNetCoreIntroductionContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("AspNetCoreIntroductionContext")));
+
+            services.AddRepositoriesServices();
 
             services.AddConfig(mandatoryInfoConfiguration =>
                 Configuration.GetSection("MandatoryInfoConfiguration").Bind(mandatoryInfoConfiguration));

@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AspNetCore.Introduction.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace AspNetCore.Introduction.Models
+namespace AspNetCore.Introduction.Repositories
 {
     public partial class AspNetCoreIntroductionContext : DbContext
     {

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using AspNetCore.Introduction.Interfaces;
 using AspNetCore.Introduction.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,18 +9,17 @@ namespace AspNetCore.Introduction.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly AspNetCoreIntroductionContext _context;
+        private readonly IDbCategoryRepository _categoryRepository;
 
-        public CategoriesController(AspNetCoreIntroductionContext context)
+        public CategoriesController(IDbCategoryRepository categoryRepository)
         {
-            _context = context;
+            _categoryRepository = categoryRepository;
         }
 
         // GET: Categories
         public async Task<IActionResult> Index(string searchString)
         {
-            var categories = from category in _context.Categories
-                select category;
+            var categories = _categoryRepository.Queryable();
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -37,8 +37,7 @@ namespace AspNetCore.Introduction.Controllers
                 return NotFound();
             }
 
-            var categories = await _context.Categories
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
+            var categories = await _categoryRepository.FindAsync(id);
             if (categories == null)
             {
                 return NotFound();
@@ -62,8 +61,8 @@ namespace AspNetCore.Introduction.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(categories);
-                await _context.SaveChangesAsync();
+                _categoryRepository.Insert(categories);
+                await _categoryRepository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(categories);
@@ -77,7 +76,7 @@ namespace AspNetCore.Introduction.Controllers
                 return NotFound();
             }
 
-            var categories = await _context.Categories.FindAsync(id);
+            var categories = await _categoryRepository.FindAsync(id);
             if (categories == null)
             {
                 return NotFound();
@@ -101,8 +100,8 @@ namespace AspNetCore.Introduction.Controllers
             {
                 try
                 {
-                    _context.Update(categories);
-                    await _context.SaveChangesAsync();
+                    _categoryRepository.Update(categories);
+                    await _categoryRepository.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -128,8 +127,7 @@ namespace AspNetCore.Introduction.Controllers
                 return NotFound();
             }
 
-            var categories = await _context.Categories
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
+            var categories = await _categoryRepository.FindAsync(id);
             if (categories == null)
             {
                 return NotFound();
@@ -143,15 +141,15 @@ namespace AspNetCore.Introduction.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var categories = await _context.Categories.FindAsync(id);
-            _context.Categories.Remove(categories);
-            await _context.SaveChangesAsync();
+            var categories = await _categoryRepository.FindAsync(id);
+            _categoryRepository.Delete(categories);
+            await _categoryRepository.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CategoriesExists(int id)
         {
-            return _context.Categories.Any(e => e.CategoryId == id);
+            return _categoryRepository.Get().Any(e => e.CategoryId == id);
         }
     }
 }
