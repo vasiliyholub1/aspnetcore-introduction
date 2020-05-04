@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using AspNetCore.Introduction.Configuration;
 using AspNetCore.Introduction.Interfaces;
 using AspNetCore.Introduction.Models;
+using AspNetCore.Introduction.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace AspNetCore.Introduction.Controllers
 {
-    using Microsoft.AspNetCore.Mvc.Rendering;
-    using ViewModels;
 
     public class ProductsController : Controller
     {
@@ -46,7 +46,7 @@ namespace AspNetCore.Introduction.Controllers
             }
         }
 
-        private string GetFieldName(Type type, string supposeName)
+        private static string GetFieldName(Type type, string supposeName)
         {
             var supplierProperties = type.GetProperties();
             return supplierProperties.First(s => s.Name == supposeName).Name;

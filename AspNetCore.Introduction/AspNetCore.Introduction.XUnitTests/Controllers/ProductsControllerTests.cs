@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -8,6 +7,7 @@ using AspNetCore.Introduction.Controllers;
 using AspNetCore.Introduction.Interfaces;
 using AspNetCore.Introduction.Models;
 using AspNetCore.Introduction.ViewModels;
+using AspNetCore.Introduction.XUnitTests.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -69,15 +69,15 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
                 _mockSupplierRepo.Object);
 
             // Act
-            var result = await controller.Index(string.Empty, string.Empty);
+            var result = await controller.Details(new Random().Next(int.MaxValue));
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
 
-            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
+            var model = Assert.IsAssignableFrom<Products>(
                 viewResult.ViewData.Model);
 
-            Assert.Equal(2, model.Products.Count());
+            Assert.NotNull(model);
         }
 
         [Fact]
@@ -230,22 +230,15 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
             Assert.Equal(2, model.Products.Count());
         }
 
-        private static async Task<IEnumerable<Products>> GetProductsAsync()
-        {
-            var products = new List<Products>
-            {
-                new Products() {ProductId = 1, ProductName = "Product name 1", UnitPrice = 15},
-                new Products() {ProductId = 2, ProductName = "Product name 2", UnitPrice = 25}
-            };
-            return products;
-        }
-
         private void SetupMockProductRepo()
         {
-            _mockProductRepo.Reset();
             _mockProductRepo.Setup(repo =>
                     repo.GetAsync(It.IsAny<Expression<Func<Products, bool>>>(), null, It.IsAny<string>()))
-                .Returns(GetProductsAsync());
+                .Returns(ProductsFactory.GetTwoProductsAsync());
+            _mockProductRepo.Setup(repo =>
+                    repo.FindAsync(It.IsAny<int?>()))
+                .Returns(Task.FromResult(new Products()));
+
         }
 
         private void SetupMockConfig()
