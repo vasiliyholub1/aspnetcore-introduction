@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AspNetCore.Introduction.Interfaces;
 using AspNetCore.Introduction.Models;
@@ -19,14 +21,20 @@ namespace AspNetCore.Introduction.Controllers
         // GET: Categories
         public async Task<IActionResult> Index(string searchString)
         {
-            var categories = _categoryRepository.Queryable();
+            var categories = await _categoryRepository
+                .GetAsync(GetCategoryFilter(searchString),
+                    null, null);
 
+            return View(categories.ToList());
+        }
+        private static Expression<Func<Categories, bool>> GetCategoryFilter(string searchString)
+        {
             if (!string.IsNullOrEmpty(searchString))
             {
-                categories = categories.Where(s => s.CategoryName.Contains(searchString));
+                return p => p.CategoryName.Contains(searchString);
             }
 
-            return View(await categories.ToListAsync());
+            return p => true;
         }
 
         // GET: Categories/Details/5
