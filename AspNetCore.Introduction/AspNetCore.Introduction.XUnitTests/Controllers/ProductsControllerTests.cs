@@ -81,7 +81,7 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
         }
 
         [Fact]
-        public async Task Create_ReturnsAViewResult_ReturnTemplate()
+        public void Create_ReturnsAViewResult_ReturnTemplate()
         {
             // Arrange
             SetupMockProductRepo();
@@ -94,15 +94,15 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
                 _mockSupplierRepo.Object);
 
             // Act
-            var result = await controller.Index(string.Empty, string.Empty);
+            var result = controller.Create();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
 
-            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
+            var model = Assert.IsAssignableFrom<ProductCreationViewModel>(
                 viewResult.ViewData.Model);
 
-            Assert.Equal(2, model.Products.Count());
+            Assert.NotNull(model.Product);
         }
 
         [Fact]
@@ -117,17 +117,21 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
                 _mockProductRepo.Object,
                 _mockCategoryRepo.Object,
                 _mockSupplierRepo.Object);
+            var createdProductVm = new ProductCreationViewModel {Product = ProductsFactory.Product()};
 
             // Act
-            var result = await controller.Index(string.Empty, string.Empty);
+            var result = await controller.Create(createdProductVm);
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
+            var redirectToAction = Assert.IsType<RedirectToActionResult>(result);
 
-            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
-                viewResult.ViewData.Model);
+            var actionNameIsIndex = redirectToAction.ActionName == "Index";
 
-            Assert.Equal(2, model.Products.Count());
+            Assert.True(actionNameIsIndex);
+
+            Assert.NotNull(redirectToAction);
+
+            VerifyMockProductRepo();
         }
 
         [Fact]
@@ -144,15 +148,15 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
                 _mockSupplierRepo.Object);
 
             // Act
-            var result = await controller.Index(string.Empty, string.Empty);
+            var result = await controller.Edit(new Random().Next(int.MaxValue));
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
 
-            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
+            var model = Assert.IsAssignableFrom<ProductCreationViewModel>(
                 viewResult.ViewData.Model);
 
-            Assert.Equal(2, model.Products.Count());
+            Assert.NotNull(model.Product);
         }
 
         [Fact]
@@ -167,17 +171,21 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
                 _mockProductRepo.Object,
                 _mockCategoryRepo.Object,
                 _mockSupplierRepo.Object);
+            var createdProductVm = new ProductCreationViewModel {Product = ProductsFactory.Product()};
 
             // Act
-            var result = await controller.Index(string.Empty, string.Empty);
+            var result = await controller.Edit(createdProductVm.Product.ProductId, createdProductVm);
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
+            var redirectToAction = Assert.IsType<RedirectToActionResult>(result);
 
-            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
-                viewResult.ViewData.Model);
+            var actionNameIsIndex = redirectToAction.ActionName == "Index";
 
-            Assert.Equal(2, model.Products.Count());
+            Assert.True(actionNameIsIndex);
+
+            Assert.NotNull(redirectToAction);
+
+            VerifyMockProductRepo();
         }
 
         [Fact]
@@ -194,15 +202,15 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
                 _mockSupplierRepo.Object);
 
             // Act
-            var result = await controller.Index(string.Empty, string.Empty);
+            var result = await controller.Delete(new Random().Next(int.MaxValue));
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
 
-            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
+            var model = Assert.IsAssignableFrom<Products>(
                 viewResult.ViewData.Model);
 
-            Assert.Equal(2, model.Products.Count());
+            Assert.NotNull(model);
         }
 
         [Fact]
@@ -219,15 +227,18 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
                 _mockSupplierRepo.Object);
 
             // Act
-            var result = await controller.Index(string.Empty, string.Empty);
+            var result = await controller.DeleteConfirmed(new Random().Next(int.MaxValue));
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
+            var redirectToAction = Assert.IsType<RedirectToActionResult>(result);
 
-            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
-                viewResult.ViewData.Model);
+            var actionNameIsIndex = redirectToAction.ActionName == "Index";
 
-            Assert.Equal(2, model.Products.Count());
+            Assert.True(actionNameIsIndex);
+
+            Assert.NotNull(redirectToAction);
+
+            VerifyMockProductRepo();
         }
 
         private void SetupMockProductRepo()
@@ -238,7 +249,19 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
             _mockProductRepo.Setup(repo =>
                     repo.FindAsync(It.IsAny<int?>()))
                 .Returns(Task.FromResult(new Products()));
+            _mockProductRepo.Setup(repo =>
+                repo.Insert(It.IsAny<Products>()));
+            _mockProductRepo.Setup(repo =>
+                repo.Delete(It.IsAny<Products>()));
+            _mockProductRepo.Setup(repo =>
+                repo.Update(It.IsAny<Products>()));
+        }
 
+        private void VerifyMockProductRepo()
+        {
+            _mockProductRepo.Verify(mock =>
+                    mock.SaveChangesAsync(),
+                Times.Once);
         }
 
         private void SetupMockConfig()

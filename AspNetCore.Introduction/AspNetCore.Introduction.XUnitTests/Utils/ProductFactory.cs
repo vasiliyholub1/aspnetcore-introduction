@@ -20,7 +20,14 @@ namespace AspNetCore.Introduction.XUnitTests.Utils
             Fixture.Behaviors.Add(new OmitOnRecursionBehavior(recursionDepth: 1));
         }
 
-        private static Task<Products> ProductAsync()
+        public static Products Product()
+        {
+            var result = Fixture
+                .Create<Products>();
+            return result;
+        }
+
+        public static Task<Products> ProductAsync()
         {
             var result = Fixture
                 .Create<Task<Products>>();
