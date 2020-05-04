@@ -55,6 +55,181 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
             Assert.Equal(2, model.Products.Count());
         }
 
+        [Fact]
+        public async Task Details_ReturnsAViewResult_DetailsOfProduct()
+        {
+            // Arrange
+            SetupMockProductRepo();
+            SetupMockConfig();
+
+            var controller = new ProductsController(
+                _mockConfig.Object,
+                _mockProductRepo.Object,
+                _mockCategoryRepo.Object,
+                _mockSupplierRepo.Object);
+
+            // Act
+            var result = await controller.Index(string.Empty, string.Empty);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+
+            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
+                viewResult.ViewData.Model);
+
+            Assert.Equal(2, model.Products.Count());
+        }
+
+        [Fact]
+        public async Task Create_ReturnsAViewResult_ReturnTemplate()
+        {
+            // Arrange
+            SetupMockProductRepo();
+            SetupMockConfig();
+
+            var controller = new ProductsController(
+                _mockConfig.Object,
+                _mockProductRepo.Object,
+                _mockCategoryRepo.Object,
+                _mockSupplierRepo.Object);
+
+            // Act
+            var result = await controller.Index(string.Empty, string.Empty);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+
+            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
+                viewResult.ViewData.Model);
+
+            Assert.Equal(2, model.Products.Count());
+        }
+
+        [Fact]
+        public async Task Create_ReturnsAViewResult_AddsProduct()
+        {
+            // Arrange
+            SetupMockProductRepo();
+            SetupMockConfig();
+
+            var controller = new ProductsController(
+                _mockConfig.Object,
+                _mockProductRepo.Object,
+                _mockCategoryRepo.Object,
+                _mockSupplierRepo.Object);
+
+            // Act
+            var result = await controller.Index(string.Empty, string.Empty);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+
+            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
+                viewResult.ViewData.Model);
+
+            Assert.Equal(2, model.Products.Count());
+        }
+
+        [Fact]
+        public async Task Edit_ReturnsAViewResult_ReturnTemplate()
+        {
+            // Arrange
+            SetupMockProductRepo();
+            SetupMockConfig();
+
+            var controller = new ProductsController(
+                _mockConfig.Object,
+                _mockProductRepo.Object,
+                _mockCategoryRepo.Object,
+                _mockSupplierRepo.Object);
+
+            // Act
+            var result = await controller.Index(string.Empty, string.Empty);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+
+            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
+                viewResult.ViewData.Model);
+
+            Assert.Equal(2, model.Products.Count());
+        }
+
+        [Fact]
+        public async Task Edit_ReturnsAViewResult_ReturnEditableProduct()
+        {
+            // Arrange
+            SetupMockProductRepo();
+            SetupMockConfig();
+
+            var controller = new ProductsController(
+                _mockConfig.Object,
+                _mockProductRepo.Object,
+                _mockCategoryRepo.Object,
+                _mockSupplierRepo.Object);
+
+            // Act
+            var result = await controller.Index(string.Empty, string.Empty);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+
+            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
+                viewResult.ViewData.Model);
+
+            Assert.Equal(2, model.Products.Count());
+        }
+
+        [Fact]
+        public async Task Delete_ReturnsAViewResult_ReturnTemplate()
+        {
+            // Arrange
+            SetupMockProductRepo();
+            SetupMockConfig();
+
+            var controller = new ProductsController(
+                _mockConfig.Object,
+                _mockProductRepo.Object,
+                _mockCategoryRepo.Object,
+                _mockSupplierRepo.Object);
+
+            // Act
+            var result = await controller.Index(string.Empty, string.Empty);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+
+            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
+                viewResult.ViewData.Model);
+
+            Assert.Equal(2, model.Products.Count());
+        }
+
+        [Fact]
+        public async Task Delete_ReturnsAViewResult_DeleteConfirmed()
+        {
+            // Arrange
+            SetupMockProductRepo();
+            SetupMockConfig();
+
+            var controller = new ProductsController(
+                _mockConfig.Object,
+                _mockProductRepo.Object,
+                _mockCategoryRepo.Object,
+                _mockSupplierRepo.Object);
+
+            // Act
+            var result = await controller.Index(string.Empty, string.Empty);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+
+            var model = Assert.IsAssignableFrom<ProductCategoryViewModel>(
+                viewResult.ViewData.Model);
+
+            Assert.Equal(2, model.Products.Count());
+        }
+
         private static async Task<IEnumerable<Products>> GetProductsAsync()
         {
             var products = new List<Products>
@@ -67,6 +242,7 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
 
         private void SetupMockProductRepo()
         {
+            _mockProductRepo.Reset();
             _mockProductRepo.Setup(repo =>
                     repo.GetAsync(It.IsAny<Expression<Func<Products, bool>>>(), null, It.IsAny<string>()))
                 .Returns(GetProductsAsync());

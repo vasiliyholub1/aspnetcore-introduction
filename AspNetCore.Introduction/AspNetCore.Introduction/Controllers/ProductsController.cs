@@ -122,7 +122,7 @@ namespace AspNetCore.Introduction.Controllers
         }
 
         // GET: Products/Create
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
             var productCreationVM = new ProductCreationViewModel()
             {
