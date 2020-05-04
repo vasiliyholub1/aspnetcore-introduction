@@ -17,28 +17,34 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
 {
     public class ProductsControllerTests
     {
+        private readonly Mock<IDbProductRepository> _mockProductRepo;
+        private readonly Mock<IDbCategoryRepository> _mockCategoryRepo;
+        private readonly Mock<IDbSupplierRepository> _mockSupplierRepo;
+        private readonly Mock<IOptions<MandatoryInfoConfiguration>> _mockConfig;
+
+        public ProductsControllerTests()
+        {
+            _mockProductRepo = new Mock<IDbProductRepository>();
+            _mockCategoryRepo = new Mock<IDbCategoryRepository>();
+            _mockSupplierRepo = new Mock<IDbSupplierRepository>();
+            _mockConfig = new Mock<IOptions<MandatoryInfoConfiguration>>();
+        }
+
         [Fact]
         public async Task Index_ReturnsAViewResult_WithAListOfProducts()
         {
             // Arrange
-            var mockProductRepo = new Mock<IDbProductRepository>();
-            var mockCategoryRepo = new Mock<IDbCategoryRepository>();
-            var mockSupplierRepo = new Mock<IDbSupplierRepository>();
-            var mockConfig = new Mock<IOptions<MandatoryInfoConfiguration>>();
-
-            mockProductRepo.Setup(repo => repo.Get(It.IsAny<Expression<Func<Products, bool>>>(), null, It.IsAny<string>()))
-                .Returns(GetProducts());
-            mockConfig.Setup(config => config.Value)
-                .Returns(GetMandatoryInfoConfiguration());
+            SetupMockProductRepo();
+            SetupMockConfig();
 
             var controller = new ProductsController(
-                mockConfig.Object,
-                mockProductRepo.Object,
-                mockCategoryRepo.Object,
-                mockSupplierRepo.Object);
+                _mockConfig.Object,
+                _mockProductRepo.Object,
+                _mockCategoryRepo.Object,
+                _mockSupplierRepo.Object);
 
             // Act
-            var result = controller.Index(string.Empty, string.Empty);
+            var result = await controller.Index(string.Empty, string.Empty);
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -49,7 +55,7 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
             Assert.Equal(2, model.Products.Count());
         }
 
-        private static IEnumerable<Products> GetProducts()
+        private static async Task<IEnumerable<Products>> GetProductsAsync()
         {
             var products = new List<Products>
             {
@@ -57,6 +63,19 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
                 new Products() {ProductId = 2, ProductName = "Product name 2", UnitPrice = 25}
             };
             return products;
+        }
+
+        private void SetupMockProductRepo()
+        {
+            _mockProductRepo.Setup(repo =>
+                    repo.GetAsync(It.IsAny<Expression<Func<Products, bool>>>(), null, It.IsAny<string>()))
+                .Returns(GetProductsAsync());
+        }
+
+        private void SetupMockConfig()
+        {
+            _mockConfig.Setup(config => config.Value)
+                .Returns(GetMandatoryInfoConfiguration());
         }
 
         private static MandatoryInfoConfiguration GetMandatoryInfoConfiguration()

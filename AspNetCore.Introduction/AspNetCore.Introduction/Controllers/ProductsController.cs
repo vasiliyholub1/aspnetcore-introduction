@@ -62,10 +62,10 @@ namespace AspNetCore.Introduction.Controllers
 
         // GET: Products
         [HttpGet]
-        public IActionResult Index(string productCategory, string searchString)
+        public async Task<IActionResult> Index(string productCategory, string searchString)
         {
-            var products = _productRepository
-                .Get(GetProductsFilter(productCategory, searchString),
+            var products = await _productRepository
+                .GetAsync(GetProductsFilter(productCategory, searchString),
                     null,"Category,Supplier");
 
             var maxItemInList = _configuration.MaxItemsInList;
