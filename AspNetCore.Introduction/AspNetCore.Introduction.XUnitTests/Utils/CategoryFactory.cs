@@ -36,13 +36,13 @@ namespace AspNetCore.Introduction.XUnitTests.Utils
 
         public static async Task<IEnumerable<Categories>> GetTwoCategoriesAsync()
         {
-            var Categories = new List<Categories>
+            var categories = new List<Categories>
             {
                 await CategoryAsync(),
                 await CategoryAsync()
             };
 
-            return await Task.FromResult(Categories);
+            return await Task.FromResult(categories);
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AspNetCore.Introduction.Interfaces;
 using AspNetCore.Introduction.Models;
+using AspNetCore.Introduction.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,11 +24,68 @@ namespace AspNetCore.Introduction.Controllers
         public async Task<IActionResult> Index(string searchString)
         {
             var categories = await _categoryRepository
-                .GetAsync(GetCategoryFilter(searchString),
-                    null, null);
+                .GetAsync(GetCategoryFilter(searchString));
 
             return View(categories.ToList());
         }
+
+        // GET: Categories/Show/5
+        [HttpGet]
+        public async Task<IActionResult> Show(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var category = await _categoryRepository.FindAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            const int startBytePositionForImage = 78;
+            var image = category.Picture?.Skip(startBytePositionForImage).ToArray();
+
+            return File(image, "image/jpg");
+        }
+
+        // GET: Categories/Show/5
+        [HttpGet]
+        public async Task<IActionResult> ShowInList(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var category = await _categoryRepository.FindAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            var imageVM = new ImageViewModel {Title = category.CategoryName, Image = GetImage(category)};
+
+            if (imageVM.Image == null)
+            {
+                imageVM.Description = "There is no image for this category.";
+                return View("ShowInListNoImage", imageVM);
+            }
+
+            return View(imageVM);
+        }
+
+        private static byte[] GetImage(Categories category)
+        {
+            var categoryLocal = category;
+            const int startBytePositionForImage = 78;
+            var image = categoryLocal.Picture?.Skip(startBytePositionForImage).ToArray();
+            return image;
+        }
+
+        public async Task<IActionResult> Download(int? id)
+
         private static Expression<Func<Categories, bool>> GetCategoryFilter(string searchString)
         {
             if (!string.IsNullOrEmpty(searchString))
@@ -65,7 +124,8 @@ namespace AspNetCore.Introduction.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,CategoryName,Description,Picture")] Categories categories)
+        public async Task<IActionResult> Create([Bind("CategoryId,CategoryName,Description,Picture")]
+            Categories categories)
         {
             if (ModelState.IsValid)
             {
@@ -73,6 +133,7 @@ namespace AspNetCore.Introduction.Controllers
                 await _categoryRepository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(categories);
         }
 
@@ -89,6 +150,7 @@ namespace AspNetCore.Introduction.Controllers
             {
                 return NotFound();
             }
+
             return View(categories);
         }
 
@@ -97,7 +159,8 @@ namespace AspNetCore.Introduction.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CategoryName,Description,Picture")] Categories categories)
+        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CategoryName,Description,Picture")]
+            Categories categories)
         {
             if (id != categories.CategoryId)
             {
@@ -122,8 +185,10 @@ namespace AspNetCore.Introduction.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(categories);
         }
 
