@@ -2,9 +2,9 @@
 
 namespace AspNetCore.Introduction.ViewModels
 {
-    public class ImageViewModel
+    public class UploadImageViewModel
     {
         [Required]
-        public HttpPostedFileBase File { get; set; }
+        public byte[] File { get; set; }
     }
 }

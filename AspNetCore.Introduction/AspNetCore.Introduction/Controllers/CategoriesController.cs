@@ -84,8 +84,6 @@ namespace AspNetCore.Introduction.Controllers
             return image;
         }
 
-        public async Task<IActionResult> Download(int? id)
-
         private static Expression<Func<Categories, bool>> GetCategoryFilter(string searchString)
         {
             if (!string.IsNullOrEmpty(searchString))
