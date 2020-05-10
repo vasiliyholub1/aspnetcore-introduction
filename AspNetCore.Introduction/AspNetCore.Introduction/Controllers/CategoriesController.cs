@@ -65,7 +65,8 @@ namespace AspNetCore.Introduction.Controllers
             var category = await _categoryRepository.FindAsync(id);
             if (category == null)
             {
-                return NotFound();
+                ViewBag.ImageNotFoundId = id;
+                return View("ImageNotFound");
             }
 
             var imageVM = new ImageViewModel {Category = category, Title = category.CategoryName, Image = GetImage(category)};

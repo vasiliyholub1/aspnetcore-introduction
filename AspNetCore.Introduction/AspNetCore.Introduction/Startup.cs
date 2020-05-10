@@ -55,6 +55,12 @@ namespace AspNetCore.Introduction
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
+                    name: "ImageRoute",
+                    pattern: "{images}/{id}",
+                    defaults: new { controller = "Categories", action = "ShowInList" }
+                );
+
+                endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
