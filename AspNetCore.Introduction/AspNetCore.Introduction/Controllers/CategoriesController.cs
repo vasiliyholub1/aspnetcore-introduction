@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AspNetCore.Introduction.Extensions;
 using AspNetCore.Introduction.Interfaces;
 using AspNetCore.Introduction.Models;
 using AspNetCore.Introduction.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +17,8 @@ namespace AspNetCore.Introduction.Controllers
     public class CategoriesController : Controller
     {
         private readonly IDbCategoryRepository _categoryRepository;
+
+        private const int StartBytePositionForImage = 78;
 
         public CategoriesController(IDbCategoryRepository categoryRepository)
         {
@@ -43,9 +48,7 @@ namespace AspNetCore.Introduction.Controllers
             {
                 return NotFound();
             }
-
-            const int startBytePositionForImage = 78;
-            var image = category.Picture?.Skip(startBytePositionForImage).ToArray();
+            var image = category.Picture?.Skip(StartBytePositionForImage).ToArray();
 
             return File(image, "image/jpg");
         }
@@ -65,7 +68,7 @@ namespace AspNetCore.Introduction.Controllers
                 return NotFound();
             }
 
-            var imageVM = new ImageViewModel {Title = category.CategoryName, Image = GetImage(category)};
+            var imageVM = new ImageViewModel {Category = category, Title = category.CategoryName, Image = GetImage(category)};
 
             if (imageVM.Image == null)
             {
@@ -74,6 +77,34 @@ namespace AspNetCore.Introduction.Controllers
             }
 
             return View(imageVM);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> FileUpload(IFormFile file, Categories category)
+        {
+            long size = file.Length;
+            var filePaths = new List<string>();
+            var formFile = file;
+            if (formFile.Length > 0)
+            {
+                // full path to file in temp location
+                var filePath = Path.GetTempFileName();
+                filePaths.Add(filePath);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await formFile.CopyToAsync(stream);
+                    category.Picture = GetImage(stream.ReadToEnd());
+                }
+                _categoryRepository.Update(category);
+                await _categoryRepository.SaveChangesAsync();
+
+                return RedirectToAction("ShowInList", new { id = category.CategoryId } );
+
+            }
+            // process uploaded files
+            // Don't rely on or trust the FileName property without validation.
+            return Ok(new { count = 1, size, filePaths });
         }
 
         private static byte[] GetImage(Categories category)
@@ -188,6 +219,19 @@ namespace AspNetCore.Introduction.Controllers
             }
 
             return View(categories);
+        }
+
+        private byte[] GetImage(IReadOnlyCollection<byte> image)
+        {
+            if (image == null || image.Count <= 0)
+            {
+                return new byte[0];
+            }
+            var prefix = new byte[78];
+            var result = new List<byte>();
+            result.AddRange(prefix);
+            result.AddRange(image);
+            return result.ToArray();
         }
 
         // GET: Categories/Delete/5
