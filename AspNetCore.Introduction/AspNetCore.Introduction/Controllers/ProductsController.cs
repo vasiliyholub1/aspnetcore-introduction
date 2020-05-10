@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using AspNetCore.Introduction.Configuration;
+﻿using AspNetCore.Introduction.Configuration;
 using AspNetCore.Introduction.Interfaces;
 using AspNetCore.Introduction.Models;
 using AspNetCore.Introduction.ViewModels;
@@ -10,47 +6,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace AspNetCore.Introduction.Controllers
 {
 
     public class ProductsController : Controller
     {
-        private readonly IDbProductRepository _productRepository;
         private readonly IDbCategoryRepository _categoryRepository;
-        private readonly IDbSupplierRepository _supplierRepository ;
 
         private readonly MandatoryInfoConfiguration _configuration;
-
-        private IQueryable<Categories> CategoryQuery => _categoryRepository.Queryable().OrderBy(c => c.CategoryName);
-
-        private IQueryable<Suppliers> SupplierQuery => _supplierRepository.Queryable().OrderBy(s => s.CompanyName);
-
-        private SelectList SupplierList
-        {
-            get
-            {
-                var value = GetFieldName(typeof(Suppliers), "SupplierId");
-                var text = GetFieldName(typeof(Suppliers), "CompanyName");
-                return new SelectList(SupplierQuery.ToList(), value, text);
-            }
-        }
-
-        private SelectList CategoryList
-        {
-            get
-            {
-                var value = GetFieldName(typeof(Categories), "CategoryId");
-                var text = GetFieldName(typeof(Categories), "CategoryName");
-                return new SelectList(CategoryQuery.ToList(), value, text);
-            }
-        }
-
-        private static string GetFieldName(Type type, string supposeName)
-        {
-            var supplierProperties = type.GetProperties();
-            return supplierProperties.First(s => s.Name == supposeName).Name;
-        }
+        private readonly IDbProductRepository _productRepository;
+        private readonly IDbSupplierRepository _supplierRepository;
 
         public ProductsController(IOptions<MandatoryInfoConfiguration> config, IDbProductRepository productRepository, IDbCategoryRepository categoryRepository, IDbSupplierRepository supplierRepository)
         {
@@ -60,28 +30,10 @@ namespace AspNetCore.Introduction.Controllers
             _configuration = config.Value;
         }
 
-        // GET: Products
-        [HttpGet]
-        public async Task<IActionResult> Index(string productCategory, string searchString)
+        private static string GetFieldName(Type type, string supposeName)
         {
-            var products = await _productRepository
-                .GetAsync(GetProductsFilter(productCategory, searchString),
-                    null,"Category,Supplier");
-
-            var maxItemInList = _configuration.MaxItemsInList;
-
-
-            products = maxItemInList > 0
-                ? products.Take(maxItemInList)
-                : products;
-
-            var productCategoryVM = new ProductCategoryViewModel()
-            {
-                Categories = new SelectList(CategoryQuery.Select(c => c.CategoryName).Distinct().ToList()),
-                Products = products.ToList()
-            };
-
-            return View(productCategoryVM);
+            var supplierProperties = type.GetProperties();
+            return supplierProperties.First(s => s.Name == supposeName).Name;
         }
 
         private static Expression<Func<Products, bool>> GetProductsFilter(string productCategory, string searchString)
@@ -104,22 +56,34 @@ namespace AspNetCore.Introduction.Controllers
             return p => true;
         }
 
-        // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
+        private bool ProductsExists(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var products = await _productRepository.FindAsync(id);
-            if (products == null)
-            {
-                return NotFound();
-            }
-
-            return View(products);
+            return _productRepository.Get().Any(e => e.ProductId == id);
         }
+
+        private SelectList CategoryList
+        {
+            get
+            {
+                var value = GetFieldName(typeof(Categories), "CategoryId");
+                var text = GetFieldName(typeof(Categories), "CategoryName");
+                return new SelectList(CategoryQuery.ToList(), value, text);
+            }
+        }
+
+        private IQueryable<Categories> CategoryQuery => _categoryRepository.Queryable().OrderBy(c => c.CategoryName);
+
+        private SelectList SupplierList
+        {
+            get
+            {
+                var value = GetFieldName(typeof(Suppliers), "SupplierId");
+                var text = GetFieldName(typeof(Suppliers), "CompanyName");
+                return new SelectList(SupplierQuery.ToList(), value, text);
+            }
+        }
+
+        private IQueryable<Suppliers> SupplierQuery => _supplierRepository.Queryable().OrderBy(s => s.CompanyName);
 
         // GET: Products/Create
         public IActionResult Create()
@@ -149,6 +113,51 @@ namespace AspNetCore.Introduction.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(productAdding);
+        }
+
+        // GET: Products/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var products = await _productRepository.FindAsync(id);
+            if (products == null)
+            {
+                return NotFound();
+            }
+
+            return View(products);
+        }
+
+        // POST: Products/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var Products = await _productRepository.FindAsync(id);
+            _productRepository.Delete(Products);
+            await _productRepository.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Products/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var products = await _productRepository.FindAsync(id);
+            if (products == null)
+            {
+                return NotFound();
+            }
+
+            return View(products);
         }
 
         // GET: Products/Edit/5
@@ -212,37 +221,28 @@ namespace AspNetCore.Introduction.Controllers
             return View(productCreationViewModel);
         }
 
-        // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: Products
+        [HttpGet]
+        public async Task<IActionResult> Index(string productCategory, string searchString)
         {
-            if (id == null)
+            var products = await _productRepository
+                .GetAsync(GetProductsFilter(productCategory, searchString),
+                    null, "Category,Supplier");
+
+            var maxItemInList = _configuration.MaxItemsInList;
+
+
+            products = maxItemInList > 0
+                ? products.Take(maxItemInList)
+                : products;
+
+            var productCategoryVM = new ProductCategoryViewModel()
             {
-                return NotFound();
-            }
+                Categories = new SelectList(CategoryQuery.Select(c => c.CategoryName).Distinct().ToList()),
+                Products = products.ToList()
+            };
 
-            var products = await _productRepository.FindAsync(id);
-            if (products == null)
-            {
-                return NotFound();
-            }
-
-            return View(products);
-        }
-
-        // POST: Products/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var Products = await _productRepository.FindAsync(id);
-            _productRepository.Delete(Products);
-            await _productRepository.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ProductsExists(int id)
-        {
-            return _productRepository.Get().Any(e => e.ProductId == id);
+            return View(productCategoryVM);
         }
     }
 }

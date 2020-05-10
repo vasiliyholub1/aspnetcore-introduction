@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using AspNetCore.Introduction.Models;
+using AutoFixture;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AspNetCore.Introduction.Models;
-using AutoFixture;
 
 namespace AspNetCore.Introduction.XUnitTests.Utils
 {
@@ -20,6 +20,17 @@ namespace AspNetCore.Introduction.XUnitTests.Utils
             Fixture.Behaviors.Add(new OmitOnRecursionBehavior(recursionDepth: 1));
         }
 
+        public static async Task<IEnumerable<Products>> GetTwoProductsAsync()
+        {
+            var products = new List<Products>
+            {
+                await ProductAsync(),
+                await ProductAsync()
+            };
+
+            return await Task.FromResult(products);
+        }
+
         public static Products Product()
         {
             var result = Fixture
@@ -32,17 +43,6 @@ namespace AspNetCore.Introduction.XUnitTests.Utils
             var result = Fixture
                 .Create<Task<Products>>();
             return result;
-        }
-
-        public static async Task<IEnumerable<Products>> GetTwoProductsAsync()
-        {
-            var products = new List<Products>
-            {
-                await ProductAsync(),
-                await ProductAsync()
-            };
-
-            return await Task.FromResult(products);
         }
     }
 }
