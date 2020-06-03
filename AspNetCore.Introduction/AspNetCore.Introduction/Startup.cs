@@ -1,4 +1,7 @@
 using AspNetCore.Introduction.Extensions;
+using AspNetCore.Introduction.Interfaces;
+using AspNetCore.Introduction.Middlewares;
+using AspNetCore.Introduction.Models;
 using AspNetCore.Introduction.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetCore.Introduction
 {
@@ -25,6 +29,11 @@ namespace AspNetCore.Introduction
                 options.UseSqlServer(Configuration.GetConnectionString("AspNetCoreIntroductionContext")));
 
             services.AddRepositoriesServices();
+            services.AddScoped<Base, Derived>();
+            services.AddLogging(builder =>
+                builder
+                    .SetMinimumLevel(LogLevel.Trace)
+                    .AddConfiguration(Configuration.GetSection("Logging")));
 
             services.AddConfig(mandatoryInfoConfiguration =>
                 Configuration.GetSection("MandatoryInfoConfiguration").Bind(mandatoryInfoConfiguration));
@@ -45,6 +54,8 @@ namespace AspNetCore.Introduction
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseImageCache();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -62,7 +73,7 @@ namespace AspNetCore.Introduction
 
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller}/{action}/{id?}");
             });
         }
     }

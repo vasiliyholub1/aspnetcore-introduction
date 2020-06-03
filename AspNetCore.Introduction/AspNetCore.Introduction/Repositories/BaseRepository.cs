@@ -1,10 +1,10 @@
-﻿using System;
+﻿using AspNetCore.Introduction.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using AspNetCore.Introduction.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace AspNetCore.Introduction.Repositories
 {
@@ -32,7 +32,7 @@ namespace AspNetCore.Introduction.Repositories
                 query = query.Where(filter);
             }
 
-            var includes = includeProperties.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            var includes = includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var include in includes)
             {
                 query = query.Include(include);
@@ -213,7 +213,7 @@ namespace AspNetCore.Introduction.Repositories
             if (entity != null)
             {
                 // Get field name from lambda expression.
-                string fieldName = ((MemberExpression) field.Body).Member.Name;
+                string fieldName = ((MemberExpression)field.Body).Member.Name;
                 // Set property value.
                 _context.Entry(entity).Reference(fieldName).CurrentValue = value;
                 // Mark property value as modified.

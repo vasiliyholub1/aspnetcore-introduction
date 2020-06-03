@@ -138,7 +138,7 @@ namespace AspNetCore.Introduction.XUnitTests.Controllers
             var editedCategory = CategoryFactory.Category();
 
             // Act
-            var result = await controller.Edit(editedCategory.CategoryId, editedCategory);
+            var result = await controller.Edit(editedCategory.CategoryId);
 
             // Assert
             var redirectToAction = Assert.IsType<RedirectToActionResult>(result);

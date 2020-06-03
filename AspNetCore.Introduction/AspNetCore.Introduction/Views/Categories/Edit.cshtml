@@ -28,6 +28,21 @@
                 <img src="@Url.Action("Show", new { id = Model.CategoryId })" alt="" />
                 <span asp-validation-for="Picture" class="text-danger"></span>
             </div>
+            <div class="row">
+                <section>
+                        <div class="form-group">
+
+                            <div class="col-md-10">
+
+                                <p>Upload image using this form:</p>
+
+                                <input type="file" name="file" multiple/>
+
+                            </div>
+                        </div>
+                </section>
+
+            </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

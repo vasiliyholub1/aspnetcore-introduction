@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using AspNetCore.Introduction.Interfaces;
 using AspNetCore.Introduction.Models;
 using AspNetCore.Introduction.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -10,20 +11,23 @@ namespace AspNetCore.Introduction.Controllers
     public class EmployeesController : Controller
     {
         private readonly AspNetCoreIntroductionContext _context;
+        private readonly Derived _derived;
 
-        public EmployeesController(AspNetCoreIntroductionContext context)
+        public EmployeesController(AspNetCoreIntroductionContext context, Base derived)
         {
             _context = context;
+            _derived = derived as Derived;
         }
 
         // GET: Employees
         public async Task<IActionResult> Index()
         {
+            _derived.SomeMethod();
             return View(await _context.Employees.ToListAsync());
         }
 
         // GET: Employees/Details/5
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
